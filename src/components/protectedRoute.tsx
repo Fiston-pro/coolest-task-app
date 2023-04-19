@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }: { children: any }) => {
         if (!user) {
             router.push('/')
         }
-    }, [])
+    }, [user])
 
   return (
     <>

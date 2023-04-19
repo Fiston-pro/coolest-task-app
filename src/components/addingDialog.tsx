@@ -18,7 +18,6 @@ const AddingDialog = ({isOpen, addingTodo, closeModal}: Props) => {
 
     const  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(todo, completed)
         addingTodo( todo , completed)
         closeDialog()
     }
