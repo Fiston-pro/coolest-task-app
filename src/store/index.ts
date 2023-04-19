@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import toast, { Toaster } from 'react-hot-toast';
 import { trpc } from "@/utils/trpc";
+import { useQuery } from "react-query";
 
 
 // Define the shape of the user data that we'll store in the store
@@ -43,25 +44,51 @@ type TodoStore = {
 export const todoStore = create<TodoStore>((set) => ({
     todos: [],
     createTodo: async (title: string, completed: boolean) => {
-      const user_id: number = userStore.getState().id as number;
+      // const user_id: number = userStore.getState().id;
       // add to db
-      const data = await trpc.createTodo.useMutation({ user_id, title, completed });
-      const newTodo = data.isSuccess ? data.data : null as unknown as Todo;
-      set((state) => ({ todos: [...state.todos, newTodo] }));
+      // const data = await trpc.createTodo.useMutation({ user_id, title, completed });
+      const todos = [...todoStore.getState().todos];
+
+      // Add the new todo object to the array
+      const newTodo = { id: todos.length + 1, title, completed };
+      todos.push(newTodo);
+  
+      // Update the todos array in the store
+      set({ todos });
+
       toast.success('Todo created successfully');
     },
 
-    getTodos: () => {
+    getTodos: async () => {
       const user_id = userStore.getState().id as number;
       // get from db
-      const data = trpc.getTodos.useQuery(user_id);
+      // const data = await trpc.getTodos.useQuery(user_id);
+      let todos = [
+        {
+          id: 1,
+          title: "Buy groceries",
+          completed: false
+        },
+        {
+          id: 2,
+          title: "Walk the dog",
+          completed: true
+        },
+        {
+          id: 3,
+          title: "Finish homework",
+          completed: false
+        }
+      ];
 
-      set({ todos: data.data });
+      set({ todos: todos });
 
     },
 
     updateTodo: async (id: number, title: string, completed: boolean) => {
       // do db stuff
+      
+
       set((state) => {
         const todoIndex = state.todos.findIndex((todo) => todo.id === id);
         if (todoIndex !== -1) {

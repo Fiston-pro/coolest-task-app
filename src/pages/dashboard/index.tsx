@@ -57,7 +57,7 @@ const ExamSimulator = () => {
             <ConfirmDialog isOpen={showClosingDialog} closeModal={()=>setShowClosingDialog(false)} successAction={Logout} text='Are you sure you want to Logout it ?' />
             { deleteTodoItem && <ConfirmingDelete id={deleteTodoItem} isOpen={true} closeModal={()=>setDeleteTodoItem(null)} successAction={deleteTodo} text='Are you sure you want to delete it ?' />}
             {
-                todos.map(todo => (
+                todos && todos.map(todo => (
                     <div key={todo.id} className='flex justify-between items-center w-1/2 bg-white p-4 rounded-lg'>
                         <input type="checkbox" checked={todo.completed} />
                         <p>{todo.title}</p>

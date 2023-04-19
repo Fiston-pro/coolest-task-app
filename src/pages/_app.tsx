@@ -6,10 +6,14 @@ import { useRouter } from 'next/router'
 import { Toaster } from 'react-hot-toast'
 import { trpc } from '../utils/trpc';
 
+import { QueryClient, QueryClientProvider } from "react-query";
+import { useState } from 'react'
+
  function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const [queryClient] = useState(() => new QueryClient())
   return (
-    <div>
+    <QueryClientProvider client={queryClient} >
       <Head>
         <title>ToDo App - Korera imbere</title>
       </Head>
@@ -17,7 +21,7 @@ import { trpc } from '../utils/trpc';
       {
         router.pathname === '/dashboard' ? <ProtectedRoute><Component {...pageProps} /></ProtectedRoute> : <Component {...pageProps} />
       }
-    </div>
+    </QueryClientProvider >
   )
 }
 

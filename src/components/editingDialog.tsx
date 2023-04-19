@@ -19,7 +19,6 @@ const EditingDialog = ({isOpen, editingTodo, closeModal, data}: Props) => {
 
     const  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(todo, completed)
         editingTodo(data.id, todo , completed)
         closeDialog()
     }
