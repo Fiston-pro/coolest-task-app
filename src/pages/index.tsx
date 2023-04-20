@@ -3,6 +3,9 @@ import { Dialog } from '@headlessui/react';
 import { userStore } from '../store';
 import router from 'next/router';
 import { trpc } from '@/utils/trpc';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { toast } from 'react-hot-toast';
 
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -21,19 +24,60 @@ export default function Home() {
     setIsSignupOpen(false);
   };
 
+  const createUserWithEmail = async (email: string, password: string) => {
+    await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      console.log(user);
+      toast.success('User created successfully');
+      const tempUser = { email: user.email, uid: user.uid };
+      console.log(tempUser);
+      const email = user.email;
+      const uid = user.uid;
+      userStore.getState().setEmail(email as string);
+      userStore.getState().setUid(uid);
+    })
+    .catch((error) => {
+      toast.error(error.code);
+      console.log(error);
+    });
+  };
+
+  const loginUserWithEmail = async (email: string, password: string) => {
+      await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user.email);
+        toast.success('User logged in successfully');
+        // add the user to the store
+        userStore.getState().setEmail(user.email as string);
+        userStore.getState().setUid(user.uid);
+        const user_id = trpc.getUser.useQuery({uid: userStore.getState().uid as string});
+        userStore.getState().setId(user_id.data?.user[0].id as number);
+        console.log('user_id', user_id.data?.user[0].id);
+      })
+      .catch((error) => {
+        console.log('below are errors')
+        toast.error(error.code);
+        console.log(error);
+      });
+  };
+
   const handleLogin = async (event: any) => {
     event.preventDefault();
     const email = event.target.email.value;
     const password = event.target.password.value;
-    await userStore.getState().loginUser(email, password);
+    await loginUserWithEmail(email, password);
     router.push('/dashboard');
   };
+
 
   const handleSignup = async (event: any) => {
     event.preventDefault();
     const email = event.target.email.value;
     const password = event.target.password.value;
-    await userStore.getState().createUser( email, password);
+    createUserWithEmail(email, password);
+    
     router.push('/dashboard');
   };
 

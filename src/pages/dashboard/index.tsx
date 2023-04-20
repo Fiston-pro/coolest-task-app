@@ -17,12 +17,13 @@ import { trpc } from '@/utils/trpc';
 
 const Dashboard = () => {
 
+    const {data} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
+    console.log("datasssss", data)
+
     const todos = todoStore(state => state.todos)
     useEffect(() => {
         todoStore.getState().getTodos();
     }, [])
-
-
 
 
     const [showClosingDialog, setShowClosingDialog] = useState(false);
@@ -46,7 +47,12 @@ const Dashboard = () => {
     }
  
     const addTodoHandle = async ( title: string, completed:boolean) => {
-        await todoStore.getState().createTodo( title, completed);                
+        // await todoStore.getState().createTodo addTodo({
+        //     title,
+        //     completed,
+        //     user_id: 3
+        // });
+        setAddTodo(false);              
     };
 
     

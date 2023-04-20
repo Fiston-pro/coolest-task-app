@@ -31,7 +31,9 @@ type UserStore = {
   uid: string | null;
   loginUser: ( email: string, password: string) => Promise<void>;
   removeUser: () => Promise<void>;
-  createUser: (email: string, uid: string) => void;
+  setId: (id: number) => void;
+  setEmail: (email: string) => void;
+  setUid: (uid: string) => void;
 };
 
 type TodoStore = {
@@ -117,28 +119,9 @@ export const userStore = create<UserStore>((set) => ({
   email: null,
   uid: null,
 
-  createUser: async ( email:string, uid:string ) => {
-    // Sign up with Firebase
-    const {mutate, isLoading} = trpc.createUser.useMutation();
-    await createUserWithEmailAndPassword(auth, email, uid).then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      console.log(user);
-      toast.success('User created successfully');
-      const tempUser = { email: user.email, uid: user.uid };
-      console.log(tempUser);
-      const email = user.email;
-      const uid = user.uid;
-      set({ email: email, uid: uid })
-      // add the user to the database
-      // mutate({ email, uid });
-
-    }).catch((error) => {
-      toast.error(error.code);
-      console.log(error);
-    });
-
-  },
+  setId: (id: number) => { set({ id }) },
+  setEmail: (email: string) => { set({ email }) },
+  setUid: (uid: string) => { set({ uid }) },
   
   loginUser: async (email: string, password: string) => {
     // Sign in with Firebase
@@ -149,7 +132,12 @@ export const userStore = create<UserStore>((set) => ({
       toast.success('User logged in successfully');
       set({ email: user.email, uid: user.uid })
       // add the user to the store
-    }).catch((error) => {
+    }).then(() => {
+      const user_id = trpc.getUser.useQuery({uid: userStore.getState().uid as string}) ;
+      set({ id: user_id.data?.user[0].id })
+      console.log('userid is ' + user_id.data?.user[0].id)
+    })
+    .catch((error) => {
       toast.error(error.code);
       console.log(error);
     });

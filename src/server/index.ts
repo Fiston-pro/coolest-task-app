@@ -8,12 +8,14 @@ export const appRouter = router({
     .mutation(async (opts) => {
       const { email, uid } = opts.input;
       // do some magic here
-      return await  client.CreateUser({uid, email})
+      return await client.CreateUser({ uid, email });
     }),
 
-  getUser: publicProcedure.input(z.object({ uid: z.string()})).query(async (opts) => {
-    const { uid } = opts.input;
-    return await client.GetUser({uid});
+  getUser: publicProcedure
+    .input(z.object({ uid: z.string() }))
+    .query(async (opts) => {
+      const { uid } = opts.input;
+      return await client.GetUser({ uid });
     }),
 
   createTodo: publicProcedure
@@ -27,15 +29,24 @@ export const appRouter = router({
     .mutation(async (opts) => {
       const { user_id, title, completed } = opts.input;
       // do some magic here
-      return await client.CreateTodo({user_id, title, completed});
+      return await client.CreateTodo({ user_id, title, completed });
     }),
 
-  getTodos: publicProcedure.input(z.object({ user_id: z.number() })).query(async (opts) => {
-    // Retrieve users from a datasource, this is an imaginary database
-    const { user_id } = opts.input;
-    return await client.GetTodos({
-        id: user_id});
-  }),
+  getTodos: publicProcedure
+    .input(z.object({ user_id: z.number().nullable() }))
+    .query(async (opts) => {
+      // Retrieve users from a datasource, this is an imaginary database
+      const { user_id } = opts.input;
+
+      if (user_id == null) {
+        return []
+      }
+      const res = await client.GetTodos({
+        id: user_id,
+      });
+      console.log(res);
+      return res
+    }),
 
   updateTodo: publicProcedure
     .input(
@@ -49,18 +60,18 @@ export const appRouter = router({
         id,
         title,
         completed,
-      })
-       
+      });
     }),
 
   deleteTodo: publicProcedure.input(z.number()).mutation(async (opts) => {
     // Retrieve users from a datasource, this is an imaginary database
     const id = opts.input;
     // do some magic here
-    return await client.DeleteTodo({todoId: id}) ;
+    return await client.DeleteTodo({ todoId: id });
   }),
 
   helo: publicProcedure.query(async () => {
+    console.log("hello");
     return "hello";
   }),
 });
