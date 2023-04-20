@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { userStore } from '../store';
 import router from 'next/router';
+import { trpc } from '@/utils/trpc';
 
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -35,8 +36,6 @@ export default function Home() {
     await userStore.getState().createUser( email, password);
     router.push('/dashboard');
   };
-
-
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">

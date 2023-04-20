@@ -1,0 +1,7 @@
+mutation UpdateTodo($title: String!, $completed: Boolean!, $id: Int!) {
+  update_todos_by_pk(pk_columns: {id: $id}, _set: {title: $title, completed: $completed}) {
+    id
+    title
+    completed
+  }
+}

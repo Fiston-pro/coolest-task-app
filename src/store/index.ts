@@ -136,7 +136,10 @@ export const userStore = create<UserStore>((set) => ({
       console.log(tempUser);
       set({ email: user.email, uid: user.uid })
       // add the user to the database
-      
+      const {isSuccess, isError} = useQuery( 'create User', () => axiosInstance.post('/api/createUser', { email: user.email, uid: user.uid }).catch((err) => {toast.error('User not created in Db'); console.log(err);}));
+      if (isSuccess) {
+        toast.success('User created in Db');
+      }
     }).catch((error) => {
       toast.error(error.code);
       console.log(error);

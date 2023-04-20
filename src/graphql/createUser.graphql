@@ -1,0 +1,5 @@
+mutation CreateUser($uid: String!, $email: String!) {
+    insert_user_one(object: {email: $email,  uid: $uid}) {
+    id
+    }
+}

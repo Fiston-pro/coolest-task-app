@@ -1,0 +1,5 @@
+mutation DeleteTodo($todoId: Int!) {
+delete_todos_by_pk(id: $todoId) {
+    id
+}
+}
