@@ -40,7 +40,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-gray-800 mb-8">Welcome to a To Do App</h1>
+      <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Welcome to a To Do App</h1>
       <div className="flex space-x-4">
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
@@ -65,7 +65,7 @@ export default function Home() {
             {isLoginOpen ? 'Enter your credentials to login' : 'Enter your details to signup'}
           </Dialog.Description>
           {isLoginOpen ? (
-            <form className='w-96' onSubmit={handleLogin}>
+            <form className=' w-56 md:w-96' onSubmit={handleLogin}>
               <div className=" mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email
@@ -96,7 +96,7 @@ export default function Home() {
                 </button>
                 </form>
                 ) : (
-                <form className='w-96' onSubmit={handleSignup}>
+                <form className='w-56 md:w-96' onSubmit={handleSignup}>
                 <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email

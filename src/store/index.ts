@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import toast, { Toaster } from 'react-hot-toast';
 import { trpc } from "@/utils/trpc";
 import { useQuery } from "react-query";
+import axiosInstance from "@/components/axiosInstance";
 
 
 // Define the shape of the user data that we'll store in the store
@@ -104,7 +105,15 @@ export const todoStore = create<TodoStore>((set) => ({
 
     deleteTodo: async (id: number) => {
       set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }));
-      toast.success('Todo deleted successfully');
+      const { isSuccess, isError } = useQuery( 'delete Todo', () => axiosInstance.post('/api/deleteTodo', { id }).catch((err) => {
+        console.log(err);
+      }));
+      if (isSuccess) {
+        toast.success('Todo deleted successfully');
+      }
+      if (isError) {
+        toast.error('Todo not deleted');
+      }
     },
   }));
 

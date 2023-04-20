@@ -58,7 +58,7 @@ const ExamSimulator = () => {
             { deleteTodoItem && <ConfirmingDelete id={deleteTodoItem} isOpen={true} closeModal={()=>setDeleteTodoItem(null)} successAction={deleteTodo} text='Are you sure you want to delete it ?' />}
             {
                 todos && todos.map(todo => (
-                    <div key={todo.id} className='flex justify-between items-center w-1/2 bg-white p-4 rounded-lg'>
+                    <div key={todo.id} className='flex w-full justify-between items-center md:w-1/2 bg-white text-sm md:text-lg p-4 rounded-lg'>
                         <input type="checkbox" checked={todo.completed} />
                         <p>{todo.title}</p>
                         <div className='flex flex-row gap-2'>
