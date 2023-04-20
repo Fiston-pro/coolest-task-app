@@ -11,6 +11,11 @@ export const appRouter = router({
       return await  client.CreateUser({uid, email})
     }),
 
+  getUser: publicProcedure.input(z.object({ uid: z.string()})).query(async (opts) => {
+    const { uid } = opts.input;
+    return await client.GetUser({uid});
+    }),
+
   createTodo: publicProcedure
     .input(
       z.object({

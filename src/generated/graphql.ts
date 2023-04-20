@@ -1000,6 +1000,13 @@ export type GetTodosQueryVariables = Exact<{
 
 export type GetTodosQuery = { __typename?: 'query_root', todos: Array<{ __typename?: 'todos', title: string, id: number, completed: boolean }> };
 
+export type GetUserQueryVariables = Exact<{
+  uid: Scalars['String'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'query_root', user: Array<{ __typename?: 'user', id: number }> };
+
 export type UpdateTodoMutationVariables = Exact<{
   title: Scalars['String'];
   completed: Scalars['Boolean'];
@@ -1044,6 +1051,13 @@ export const GetTodosDocument = gql`
   }
 }
     `;
+export const GetUserDocument = gql`
+    query GetUser($uid: String!) {
+  user(where: {uid: {_eq: $uid}}) {
+    id
+  }
+}
+    `;
 export const UpdateTodoDocument = gql`
     mutation UpdateTodo($title: String!, $completed: Boolean!, $id: Int!) {
   update_todos_by_pk(
@@ -1075,6 +1089,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetTodos(variables: GetTodosQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTodosQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetTodosQuery>(GetTodosDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetTodos', 'query');
+    },
+    GetUser(variables: GetUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserQuery>(GetUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetUser', 'query');
     },
     UpdateTodo(variables: UpdateTodoMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTodoMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateTodoMutation>(UpdateTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UpdateTodo', 'mutation');

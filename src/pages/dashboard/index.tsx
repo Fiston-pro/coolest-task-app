@@ -10,15 +10,20 @@ import router from 'next/router';
 import EditingDialog from '@/components/editingDialog';
 import AddingDialog from '@/components/addingDialog';
 import ConfirmingDelete from '@/components/confirmingDelete';
+import { useQuery } from 'react-query';
+import { trpc } from '@/utils/trpc';
 
 
 
-const ExamSimulator = () => {
+const Dashboard = () => {
 
     const todos = todoStore(state => state.todos)
     useEffect(() => {
         todoStore.getState().getTodos();
     }, [])
+
+
+
 
     const [showClosingDialog, setShowClosingDialog] = useState(false);
     const [editingTodo, setEditingTodo] = useState<any>(null);
@@ -84,4 +89,4 @@ const ExamSimulator = () => {
     
     };
 
-export default ExamSimulator;
+export default Dashboard;

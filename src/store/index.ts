@@ -45,9 +45,8 @@ type TodoStore = {
 export const todoStore = create<TodoStore>((set) => ({
     todos: [],
     createTodo: async (title: string, completed: boolean) => {
-      // const user_id: number = userStore.getState().id;
+      const user_id: number = userStore.getState().id as number;
       // add to db
-      // const data = await trpc.createTodo.useMutation({ user_id, title, completed });
       const todos = [...todoStore.getState().todos];
 
       // Add the new todo object to the array
@@ -64,31 +63,33 @@ export const todoStore = create<TodoStore>((set) => ({
       const user_id = userStore.getState().id as number;
       // get from db
       // const data = await trpc.getTodos.useQuery(user_id);
-      let todos = [
+      const todos = [
         {
           id: 1,
-          title: "Buy groceries",
-          completed: false
+          title: 'Todo 1',
+          completed: false,
         },
         {
           id: 2,
-          title: "Walk the dog",
-          completed: true
+          title: 'Todo 2',
+          completed: false,
         },
         {
           id: 3,
-          title: "Finish homework",
-          completed: false
-        }
-      ];
+          title: 'Todo 3',
+          completed: false,
+        },
+      ]
 
       set({ todos: todos });
+      console.log(todos); 
+      return todos
 
     },
 
     updateTodo: async (id: number, title: string, completed: boolean) => {
       // do db stuff
-      
+      // await trpc.updateTodo.useMutation({ id, title, completed });
 
       set((state) => {
         const todoIndex = state.todos.findIndex((todo) => todo.id === id);
@@ -105,15 +106,6 @@ export const todoStore = create<TodoStore>((set) => ({
 
     deleteTodo: async (id: number) => {
       set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }));
-      const { isSuccess, isError } = useQuery( 'delete Todo', () => axiosInstance.post('/api/deleteTodo', { id }).catch((err) => {
-        console.log(err);
-      }));
-      if (isSuccess) {
-        toast.success('Todo deleted successfully');
-      }
-      if (isError) {
-        toast.error('Todo not deleted');
-      }
     },
   }));
 
@@ -127,6 +119,7 @@ export const userStore = create<UserStore>((set) => ({
 
   createUser: async ( email:string, uid:string ) => {
     // Sign up with Firebase
+    const {mutate, isLoading} = trpc.createUser.useMutation();
     await createUserWithEmailAndPassword(auth, email, uid).then((userCredential) => {
       // Signed in
       const user = userCredential.user;
@@ -134,12 +127,12 @@ export const userStore = create<UserStore>((set) => ({
       toast.success('User created successfully');
       const tempUser = { email: user.email, uid: user.uid };
       console.log(tempUser);
-      set({ email: user.email, uid: user.uid })
+      const email = user.email;
+      const uid = user.uid;
+      set({ email: email, uid: uid })
       // add the user to the database
-      const {isSuccess, isError} = useQuery( 'create User', () => axiosInstance.post('/api/createUser', { email: user.email, uid: user.uid }).catch((err) => {toast.error('User not created in Db'); console.log(err);}));
-      if (isSuccess) {
-        toast.success('User created in Db');
-      }
+      // mutate({ email, uid });
+
     }).catch((error) => {
       toast.error(error.code);
       console.log(error);
