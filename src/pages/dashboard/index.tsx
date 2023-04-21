@@ -20,19 +20,16 @@ const Dashboard = () => {
     
     const { data, isSuccess } = trpc.getTodos.useQuery({user_id: userStore.getState().id})
 
+    const { data: getUserData, isSuccess: isGetUserSuccess } = trpc.getUser.useQuery({ uid: userStore.getState().uid });
 
     if (isSuccess && data ) {
-        todoStore.getState().addTodos(data['todos']);
+        todoStore.getState().addTodos(data.todos);
 
     }
 
-    if (userStore.getState().id) {
-        const {data} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
-    }
 
     if (!userStore.getState().id) {
-        const { data, isSuccess } = trpc.getUser.useQuery({ uid: userStore.getState().uid });
-        isSuccess && userStore.getState().setId(data!.user[0]?.id) ;
+        isGetUserSuccess && userStore.getState().setId(getUserData?.user[0]?.id) ;
     }
 
 
@@ -76,7 +73,7 @@ const Dashboard = () => {
                 <HiArrowNarrowRight className="ml-2" />
             </div>
             { addTodo && <AddingDialog isOpen={true} closeModal={()=>setAddTodo(false)} />}
-            { editingTodo && <EditingDialog isOpen={true} closeModal={()=>setEditingTodo(null)} editingTodo={updateTodo} data={editingTodo} />}
+            { editingTodo && <EditingDialog isOpen={true} closeModal={()=>setEditingTodo(null)} data={editingTodo} />}
             <ConfirmDialog isOpen={showClosingDialog} closeModal={()=>setShowClosingDialog(false)} successAction={Logout} text='Are you sure you want to Logout it ?' />
             { deleteTodoItem && <ConfirmingDelete id={deleteTodoItem} isOpen={true} closeModal={handledeleteTodo} text='Are you sure you want to delete it ?' />}
             {

@@ -21,7 +21,9 @@ export const appRouter = router({
     .query(async (opts) => {
       const { uid } = opts.input;
       if (uid == null) {
-        return []
+        return {
+          user: []
+        }
       }
       return await client.GetUser({ uid });
     }),
@@ -47,7 +49,9 @@ export const appRouter = router({
       const { user_id } = opts.input;
 
       if (user_id == null) {
-        return []
+        return{
+          todos: []
+        }
       }
       const res = await client.GetTodos({
         id: user_id,

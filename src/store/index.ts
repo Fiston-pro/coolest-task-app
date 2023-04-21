@@ -38,7 +38,7 @@ type UserStore = {
 type TodoStore = {
   todos: Todo[];
   createTodo: (id:number, title: string, completed: boolean) => void;
-  addTodos: (todos: Todo[]) => void;
+  addTodos: (todos: any) => void;
   updateTodo: (id: number, title: string, completed: boolean) => void;
   deleteTodo: (id: number) => void;
 }
