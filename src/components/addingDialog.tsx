@@ -9,8 +9,14 @@ interface Props{
 }
 
 const AddingDialog = ({isOpen, closeModal}: Props) => {
+    const {refetch} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
 
-    const { mutate, data, isSuccess,  } = trpc.createTodo.useMutation()
+
+    const { mutate, data, isSuccess,  } = trpc.createTodo.useMutation({
+        onSuccess: () => {
+            refetch()
+        }
+    })
 
     const [todo, setTodo] = useState<string>("")
     const [completed, setCompleted] = useState<boolean>(false)
@@ -21,7 +27,7 @@ const AddingDialog = ({isOpen, closeModal}: Props) => {
 
     const  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        await mutate({title: todo, completed, user_id: userStore.getState().id as number}) // add to db
+        mutate({title: todo, completed, user_id: userStore.getState().id as number}) // add to db
         todoStore.getState().createTodo( data?.insert_todos_one?.id as number, todo , completed) // add to store
         closeModal()
     }

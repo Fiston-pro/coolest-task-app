@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "./trpc";
 import client from "@/utils/client";
 import { error } from "console";
+import { todoStore } from "@/store";
 
 export const appRouter = router({
   createUser: publicProcedure
@@ -74,7 +75,7 @@ export const appRouter = router({
     // Retrieve users from a datasource, this is an imaginary database
     const {id} = opts.input;
     // do some magic here
-    return await client.DeleteTodo({ todoId: id });
+    return client.DeleteTodo({ todoId: id });
   }),
 
   helo: publicProcedure.query(async () => {

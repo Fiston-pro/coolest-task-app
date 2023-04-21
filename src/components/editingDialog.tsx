@@ -1,21 +1,26 @@
 import React,{Fragment, useState} from 'react';
 import { Dialog, Transition } from '@headlessui/react'
 import { trpc } from '@/utils/trpc';
-import { todoStore } from '@/store';
+import { todoStore, userStore } from '@/store';
 
 interface Props{
     data: {id:number, title: string, completed: boolean} ,
     isOpen: boolean,
     closeModal: () => void,
-    editingTodo: (id:number, title: string, completed: boolean) => void,
 }
 
-const EditingDialog = ({isOpen, editingTodo, closeModal, data}: Props) => {
+const EditingDialog = ({isOpen, closeModal, data}: Props) => {
 
     const [todo, setTodo] = useState<string>(data.title)
     const [completed, setCompleted] = useState<boolean>(data.completed)
+    
+    const {refetch} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
 
-    const { mutate } = trpc.updateTodo.useMutation()
+    const { mutate } = trpc.updateTodo.useMutation({
+        onSuccess: () => {
+            refetch()
+        }
+    })
 
     const closeDialog = () =>{
         closeModal()
@@ -104,3 +109,4 @@ const EditingDialog = ({isOpen, editingTodo, closeModal, data}: Props) => {
 };
 
 export default EditingDialog;
+

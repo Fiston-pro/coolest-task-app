@@ -1,7 +1,7 @@
 import React,{Fragment} from 'react';
 import { Dialog, Transition } from '@headlessui/react'
 import { trpc } from '@/utils/trpc';
-import { todoStore } from '@/store';
+import { todoStore, userStore } from '@/store';
 
 interface Props{
     isOpen: boolean,
@@ -11,17 +11,22 @@ interface Props{
 }
 
 const ConfirmingDelete = ({isOpen, closeModal, text, id }: Props) => {
+    const {refetch} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
 
-    const { mutate } = trpc.deleteTodo.useMutation()
+    const { mutate } = trpc.deleteTodo.useMutation({
+        onSuccess: () => {
+            refetch()
+        }
+    })
 
     const closeDialog = () =>{
         closeModal()
     }
 
     const onSuccess = async ( id:number ) => {
-        await todoStore.getState().deleteTodo(id) // delete from store
+        todoStore.getState().deleteTodo(id) // delete from store
         console.log('all todos in store',todoStore.getState().todos)
-        await mutate({id}) // delete from db
+        mutate({id}) // delete from db
         closeModal()
     }
 

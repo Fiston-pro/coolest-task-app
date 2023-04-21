@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import * as Dom from 'graphql-request/dist/types.dom';
+import * as Dom from 'graphql-request/build/esm/types.dom';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -1098,4 +1098,5 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     }
   };
 }
+
 export type Sdk = ReturnType<typeof getSdk>;
