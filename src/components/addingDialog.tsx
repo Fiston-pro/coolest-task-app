@@ -1,13 +1,16 @@
 import React,{Fragment, useState} from 'react';
 import { Dialog, Transition } from '@headlessui/react'
+import { trpc } from '@/utils/trpc';
+import { todoStore, userStore } from '@/store';
 
 interface Props{
     isOpen: boolean,
     closeModal: () => void,
-    addingTodo: ( title: string, completed: boolean) => void,
 }
 
-const AddingDialog = ({isOpen, addingTodo, closeModal}: Props) => {
+const AddingDialog = ({isOpen, closeModal}: Props) => {
+
+    const { mutate, data, isSuccess,  } = trpc.createTodo.useMutation()
 
     const [todo, setTodo] = useState<string>("")
     const [completed, setCompleted] = useState<boolean>(false)
@@ -16,9 +19,14 @@ const AddingDialog = ({isOpen, addingTodo, closeModal}: Props) => {
         closeModal()
     }
 
-    const  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        addingTodo( todo , completed)
+        await mutate({title: todo, completed, user_id: userStore.getState().id as number}) // add to db
+        todoStore.getState().createTodo( data?.insert_todos_one?.id as number, todo , completed) // add to store
+        closeModal()
+    }
+
+    if (isSuccess) {
         closeDialog()
     }
 
@@ -55,7 +63,7 @@ const AddingDialog = ({isOpen, addingTodo, closeModal}: Props) => {
                                 as="h3"
                                 className="text-lg leading-6 text-secondary font-bold"
                             >
-                                Edit the your Todo
+                                Add your Todo
                             </Dialog.Title>
 
                             <form className='w-96' onSubmit={onSubmit}>

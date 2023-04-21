@@ -1,17 +1,27 @@
 import React,{Fragment} from 'react';
 import { Dialog, Transition } from '@headlessui/react'
+import { trpc } from '@/utils/trpc';
+import { todoStore } from '@/store';
 
 interface Props{
     isOpen: boolean,
     closeModal: () => void,
     text: string,
-    successAction: (id:number) => void,
     id: number,
 }
 
-const ConfirmingDelete = ({isOpen, successAction, closeModal, text, id }: Props) => {
+const ConfirmingDelete = ({isOpen, closeModal, text, id }: Props) => {
+
+    const { mutate } = trpc.deleteTodo.useMutation()
 
     const closeDialog = () =>{
+        closeModal()
+    }
+
+    const onSuccess = async ( id:number ) => {
+        await todoStore.getState().deleteTodo(id) // delete from store
+        console.log('all todos in store',todoStore.getState().todos)
+        await mutate({id}) // delete from db
         closeModal()
     }
 
@@ -60,7 +70,7 @@ const ConfirmingDelete = ({isOpen, successAction, closeModal, text, id }: Props)
 
                             <div className="mt-4 flex flex-row justify-between ">
                                 <button className="text-base mt-2 px-3 py-1 flex flex-row items-center border rounded-3xl text-secondary bg-blue-200 hover:bg-blue-500 cursor-pointer" onClick={closeModal}>Cancel</button>
-                                <button className="text-base mt-2 px-3 py-1 flex flex-row items-center border rounded-3xl text-secondary bg-blue-200 hover:bg-blue-500 cursor-pointer" onClick={()=>successAction(id)}>Confirm</button>
+                                <button className="text-base mt-2 px-3 py-1 flex flex-row items-center border rounded-3xl text-secondary bg-blue-200 hover:bg-blue-500 cursor-pointer" onClick={()=>onSuccess(id)}>Confirm</button>
                             </div>
 
                         </Dialog.Panel>

@@ -17,13 +17,29 @@ import { trpc } from '@/utils/trpc';
 
 const Dashboard = () => {
 
-    const {data} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
-    console.log("datasssss", data)
+    
+    const { data, isSuccess } = trpc.getTodos.useQuery({user_id: userStore.getState().id})
 
-    const todos = todoStore(state => state.todos)
-    useEffect(() => {
-        todoStore.getState().getTodos();
-    }, [])
+
+    if (isSuccess && data ) {
+        todoStore.getState().addTodos(data['todos']);
+
+    }
+
+    if (userStore.getState().id) {
+        const {data} = trpc.getTodos.useQuery({user_id: userStore.getState().id})
+    }
+
+    if (!userStore.getState().id) {
+        const { data, isSuccess } = trpc.getUser.useQuery({ uid: userStore.getState().uid });
+        isSuccess && userStore.getState().setId(data!.user[0]?.id) ;
+    }
+
+
+    // useEffect(() => {
+    //   userStore.getState().setId(user_id.data .user[0].id as number);
+    //   console.log('user_id', user_id.data?.user[0].id);
+    // }, [user_id.data?.user[0].id]);
 
 
     const [showClosingDialog, setShowClosingDialog] = useState(false);
@@ -31,30 +47,26 @@ const Dashboard = () => {
     const [addTodo, setAddTodo] = useState<boolean>(false);
     const [deleteTodoItem, setDeleteTodoItem] = useState<any>(null);
 
-    const deleteTodo = async ( id: number) => {
-        await todoStore.getState().deleteTodo(id);
-        setDeleteTodoItem(null);
-    }
-
 
     const Logout = async () => {
         await userStore.getState().removeUser();
+        todoStore.setState({todos: []});
         router.push('/')
     }
 
     const updateTodo = async (id: number , title: string, completed:boolean) => {
         await todoStore.getState().updateTodo(id, title, completed);
     }
- 
-    const addTodoHandle = async ( title: string, completed:boolean) => {
-        // await todoStore.getState().createTodo addTodo({
-        //     title,
-        //     completed,
-        //     user_id: 3
-        // });
-        setAddTodo(false);              
-    };
 
+    const handledeleteTodo = () => {
+        setDeleteTodoItem(null)
+    }
+
+    let todos = todoStore.getState().todos;
+
+    useEffect(() => {
+        todos = todoStore.getState().todos;
+    })
     
     return (
         <div className='h-screen flex flex-col justify-evenly items-center'>
@@ -63,10 +75,10 @@ const Dashboard = () => {
                 <h1 className='text-lg font-bold' >Logout</h1>
                 <HiArrowNarrowRight className="ml-2" />
             </div>
-            { addTodo && <AddingDialog isOpen={true} closeModal={()=>setAddTodo(false)} addingTodo={addTodoHandle} />}
+            { addTodo && <AddingDialog isOpen={true} closeModal={()=>setAddTodo(false)} />}
             { editingTodo && <EditingDialog isOpen={true} closeModal={()=>setEditingTodo(null)} editingTodo={updateTodo} data={editingTodo} />}
             <ConfirmDialog isOpen={showClosingDialog} closeModal={()=>setShowClosingDialog(false)} successAction={Logout} text='Are you sure you want to Logout it ?' />
-            { deleteTodoItem && <ConfirmingDelete id={deleteTodoItem} isOpen={true} closeModal={()=>setDeleteTodoItem(null)} successAction={deleteTodo} text='Are you sure you want to delete it ?' />}
+            { deleteTodoItem && <ConfirmingDelete id={deleteTodoItem} isOpen={true} closeModal={handledeleteTodo} text='Are you sure you want to delete it ?' />}
             {
                 todos && todos.map(todo => (
                     <div key={todo.id} className='flex w-full justify-between items-center md:w-1/2 bg-white text-sm md:text-lg p-4 rounded-lg'>

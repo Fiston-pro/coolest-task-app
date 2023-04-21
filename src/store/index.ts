@@ -29,7 +29,6 @@ type UserStore = {
   id: number | null;
   email: string | null;
   uid: string | null;
-  loginUser: ( email: string, password: string) => Promise<void>;
   removeUser: () => Promise<void>;
   setId: (id: number) => void;
   setEmail: (email: string) => void;
@@ -38,55 +37,28 @@ type UserStore = {
 
 type TodoStore = {
   todos: Todo[];
-  createTodo: (title: string, completed: boolean) => void;
-  getTodos: () => void;
+  createTodo: (id:number, title: string, completed: boolean) => void;
+  addTodos: (todos: Todo[]) => void;
   updateTodo: (id: number, title: string, completed: boolean) => void;
   deleteTodo: (id: number) => void;
 }
 
 export const todoStore = create<TodoStore>((set) => ({
     todos: [],
-    createTodo: async (title: string, completed: boolean) => {
-      const user_id: number = userStore.getState().id as number;
-      // add to db
+    createTodo: ( id:number, title: string, completed: boolean) => {
+      
       const todos = [...todoStore.getState().todos];
-
       // Add the new todo object to the array
-      const newTodo = { id: todos.length + 1, title, completed };
+      const newTodo = { id, title, completed };
       todos.push(newTodo);
-  
       // Update the todos array in the store
       set({ todos });
 
       toast.success('Todo created successfully');
     },
 
-    getTodos: async () => {
-      const user_id = userStore.getState().id as number;
-      // get from db
-      // const data = await trpc.getTodos.useQuery(user_id);
-      const todos = [
-        {
-          id: 1,
-          title: 'Todo 1',
-          completed: false,
-        },
-        {
-          id: 2,
-          title: 'Todo 2',
-          completed: false,
-        },
-        {
-          id: 3,
-          title: 'Todo 3',
-          completed: false,
-        },
-      ]
-
+    addTodos: ( todos: Todo[] ) => {
       set({ todos: todos });
-      console.log(todos); 
-      return todos
-
     },
 
     updateTodo: async (id: number, title: string, completed: boolean) => {
@@ -119,29 +91,9 @@ export const userStore = create<UserStore>((set) => ({
   email: null,
   uid: null,
 
-  setId: (id: number) => { set({ id }) },
+  setId: (id: number) => {  set({ id }) },
   setEmail: (email: string) => { set({ email }) },
   setUid: (uid: string) => { set({ uid }) },
-  
-  loginUser: async (email: string, password: string) => {
-    // Sign in with Firebase
-    await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      console.log(user.email);
-      toast.success('User logged in successfully');
-      set({ email: user.email, uid: user.uid })
-      // add the user to the store
-    }).then(() => {
-      const user_id = trpc.getUser.useQuery({uid: userStore.getState().uid as string}) ;
-      set({ id: user_id.data?.user[0].id })
-      console.log('userid is ' + user_id.data?.user[0].id)
-    })
-    .catch((error) => {
-      toast.error(error.code);
-      console.log(error);
-    });
-  },
 
   removeUser: async () => {
     try {

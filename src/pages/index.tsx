@@ -11,6 +11,13 @@ export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
+  const { mutate, isSuccess, data } = trpc.createUser.useMutation();
+
+  if (isSuccess && data.insert_user_one?.id) {
+    userStore.getState().setId(data.insert_user_one.id);
+    router.push('/dashboard');
+  }
+
   const handleLoginClick = () => {
     setIsLoginOpen(true);
   };
@@ -28,17 +35,16 @@ export default function Home() {
     await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
       // Signed in
       const user = userCredential.user;
-      console.log(user);
       toast.success('User created successfully');
       const tempUser = { email: user.email, uid: user.uid };
-      console.log(tempUser);
       const email = user.email;
       const uid = user.uid;
       userStore.getState().setEmail(email as string);
       userStore.getState().setUid(uid);
+      mutate({ email, uid });
     })
     .catch((error) => {
-      toast.error(error.code);
+      toast.error('Unable to signup');
       console.log(error);
     });
   };
@@ -47,28 +53,28 @@ export default function Home() {
       await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user.email);
         toast.success('User logged in successfully');
         // add the user to the store
         userStore.getState().setEmail(user.email as string);
         userStore.getState().setUid(user.uid);
-        const user_id = trpc.getUser.useQuery({uid: userStore.getState().uid as string});
-        userStore.getState().setId(user_id.data?.user[0].id as number);
-        console.log('user_id', user_id.data?.user[0].id);
+        // const user_id = trpc.getUser.useQuery({uid: userStore.getState().uid as string});
+        // userStore.getState().setId(user_id.data?.user[0].id as number);
+        // console.log('user_id', user_id.data?.user[0].id);
+        router.push('/dashboard');
       })
       .catch((error) => {
-        console.log('below are errors')
+        toast.error('Unable to login')
         toast.error(error.code);
         console.log(error);
       });
   };
+
 
   const handleLogin = async (event: any) => {
     event.preventDefault();
     const email = event.target.email.value;
     const password = event.target.password.value;
     await loginUserWithEmail(email, password);
-    router.push('/dashboard');
   };
 
 
@@ -77,9 +83,7 @@ export default function Home() {
     const email = event.target.email.value;
     const password = event.target.password.value;
     createUserWithEmail(email, password);
-    
-    router.push('/dashboard');
-  };
+    };
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">

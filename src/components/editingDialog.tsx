@@ -1,5 +1,7 @@
 import React,{Fragment, useState} from 'react';
 import { Dialog, Transition } from '@headlessui/react'
+import { trpc } from '@/utils/trpc';
+import { todoStore } from '@/store';
 
 interface Props{
     data: {id:number, title: string, completed: boolean} ,
@@ -13,13 +15,16 @@ const EditingDialog = ({isOpen, editingTodo, closeModal, data}: Props) => {
     const [todo, setTodo] = useState<string>(data.title)
     const [completed, setCompleted] = useState<boolean>(data.completed)
 
+    const { mutate } = trpc.updateTodo.useMutation()
+
     const closeDialog = () =>{
         closeModal()
     }
 
-    const  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        editingTodo(data.id, todo , completed)
+        await mutate({id: data.id, title: todo, completed}) // update db
+        todoStore.getState().updateTodo( data.id, todo , completed) // update store
         closeDialog()
     }
 

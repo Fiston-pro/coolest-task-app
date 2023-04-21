@@ -1,20 +1,27 @@
 import { z } from "zod";
 import { publicProcedure, router } from "./trpc";
 import client from "@/utils/client";
+import { error } from "console";
 
 export const appRouter = router({
   createUser: publicProcedure
-    .input(z.object({ email: z.string().email(), uid: z.string() }))
+    .input(z.object({ email: z.string().email().nullable(), uid: z.string() }))
     .mutation(async (opts) => {
       const { email, uid } = opts.input;
       // do some magic here
+      if (email == null){
+        throw error("Creating user without Email")
+      }
       return await client.CreateUser({ uid, email });
     }),
 
   getUser: publicProcedure
-    .input(z.object({ uid: z.string() }))
+    .input(z.object({ uid: z.string().nullable() }))
     .query(async (opts) => {
       const { uid } = opts.input;
+      if (uid == null) {
+        return []
+      }
       return await client.GetUser({ uid });
     }),
 
@@ -63,9 +70,9 @@ export const appRouter = router({
       });
     }),
 
-  deleteTodo: publicProcedure.input(z.number()).mutation(async (opts) => {
+  deleteTodo: publicProcedure.input( z.object( { id: z.number()} ) ).mutation(async (opts) => {
     // Retrieve users from a datasource, this is an imaginary database
-    const id = opts.input;
+    const {id} = opts.input;
     // do some magic here
     return await client.DeleteTodo({ todoId: id });
   }),
