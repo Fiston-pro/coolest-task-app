@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { mutate, isSuccess, data } = trpc.createUser.useMutation();
 
@@ -124,16 +125,19 @@ export default function Home() {
                   className="border-gray-300 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full rounded-md sm:text-sm"
                 />
               </div>
-              <div className="mb-4">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
+              <div className="relative mb-2">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   className="border-gray-300 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full rounded-md sm:text-sm"
                 />
+                <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                  onClick={()=>setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
               <button
                 type="submit"
